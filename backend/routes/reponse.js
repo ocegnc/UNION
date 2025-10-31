@@ -1,13 +1,12 @@
 const express = require('express');
-const { query } = require('../db'); // on réutilise la fonction query centralisée
+const { query } = require('../db'); 
 const router = express.Router();
 
 // Helper
 const isPositiveInt = (v) => Number.isInteger(v) && v > 0;
 
 // -----------------------------
-// GET /api/reponse
-// → Récupère toutes les réponses
+// Récupèrer toutes les réponses
 // -----------------------------
 router.get('/', async (req, res) => {
     try {
@@ -20,8 +19,7 @@ router.get('/', async (req, res) => {
 });
 
 // -----------------------------
-// GET /api/reponse/:id
-// → Récupère une réponse par ID
+// Récupèrer une réponse par ID
 // -----------------------------
 router.get('/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);
@@ -38,8 +36,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // -----------------------------
-// POST /api/reponse
-// → Crée une nouvelle réponse
+// Créer une nouvelle réponse
 // -----------------------------
 router.post('/', async (req, res) => {
     const { reponse_libre = null, id_question, id_choix = null } = req.body;
@@ -75,8 +72,7 @@ router.post('/', async (req, res) => {
 });
 
 // -----------------------------
-// PUT /api/reponse/:id
-// → Met à jour une réponse
+// Mettre à jour une réponse
 // -----------------------------
 router.put('/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);
@@ -129,8 +125,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // -----------------------------
-// DELETE /api/reponse/:id
-// → Supprime une réponse
+// Supprimer une réponse
 // -----------------------------
 router.delete('/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);

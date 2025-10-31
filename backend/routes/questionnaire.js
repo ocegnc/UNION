@@ -3,7 +3,7 @@ const { query } = require('../db');
 const router = express.Router();
 
 // -----------------------------
-// GET /questionnaires - Liste tous les questionnaires
+// Lister tous les questionnaires
 // -----------------------------
 router.get('/', async (req, res) => {
     try {
@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 });
 
 // -----------------------------
-// GET /questionnaires/:id - Récupère un questionnaire
+// Récupèrer un questionnaire
 // -----------------------------
 router.get('/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);
@@ -38,7 +38,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // -----------------------------
-// POST /questionnaires - Crée un nouveau questionnaire
+// Créer un nouveau questionnaire
 // -----------------------------
 router.post('/', async (req, res) => {
     const { id_participant, date_remplissage = null, type, nb_questions = 0, nb_reponses = 0 } = req.body;
@@ -70,7 +70,7 @@ router.post('/', async (req, res) => {
 });
 
 // -----------------------------
-// PUT /questionnaires/:id - Met à jour un questionnaire
+// Mettre à jour un questionnaire
 // -----------------------------
 router.put('/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);
@@ -105,7 +105,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // -----------------------------
-// DELETE /questionnaires/:id - Supprime un questionnaire
+// Supprimer un questionnaire
 // -----------------------------
 router.delete('/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);

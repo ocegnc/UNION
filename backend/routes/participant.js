@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { query } = require('../db'); // ton db.js
+const { query } = require('../db'); //db.js
 
 // -----------------------------
-// LISTE TOUS LES PARTICIPANTS
+// LISTER TOUS LES PARTICIPANTS
 // -----------------------------
 router.get('/', async (req, res) => {
     try {
@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
 });
 
 // -----------------------------
-// RÉCUPÈRE UN PARTICIPANT PAR ID
+// RÉCUPÈRER UN PARTICIPANT PAR ID
 // -----------------------------
 router.get('/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);
@@ -33,7 +33,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // -----------------------------
-// CRÉE UN NOUVEAU PARTICIPANT
+// CRÉER UN NOUVEAU PARTICIPANT
 // -----------------------------
 router.post('/', async (req, res) => {
     const { age, sexe, anciennete, id_categorie } = req.body;
@@ -66,7 +66,7 @@ router.post('/', async (req, res) => {
 
 
 // -----------------------------
-// MET À JOUR UN PARTICIPANT
+// METTRE À JOUR UN PARTICIPANT
 // -----------------------------
 router.put('/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);
@@ -110,7 +110,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // -----------------------------
-// SUPPRIME UN PARTICIPANT
+// SUPPRIMER UN PARTICIPANT
 // -----------------------------
 router.delete('/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);

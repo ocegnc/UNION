@@ -58,7 +58,7 @@ app.use((err, req, res, next) => {
 // Start server
 app.listen(PORT, () => {
     console.log(`✅ Serveur démarré sur http://localhost:${PORT}`);
-    console.log('\n📚 Endpoints disponibles :');
+    console.log('\n Endpoints disponibles :');
     console.log(`➡️  GET    http://localhost:${PORT}/api/categorie`);
     console.log(`➡️  GET    http://localhost:${PORT}/api/participant`);
     console.log(`➡️  GET    http://localhost:${PORT}/api/questionnaire`);

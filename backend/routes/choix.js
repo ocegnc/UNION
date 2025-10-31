@@ -6,8 +6,7 @@ const router = express.Router();
 const isPositiveInt = (v) => Number.isInteger(v) && v > 0;
 
 // -----------------------------
-// GET /api/choix
-// → Liste tous les choix
+// Lister tous les choix
 // -----------------------------
 router.get('/', async (req, res) => {
     try {
@@ -20,8 +19,7 @@ router.get('/', async (req, res) => {
 });
 
 // -----------------------------
-// GET /api/choix/:id
-// → Récupère un choix par son ID
+// Récupèrer un choix par son ID
 // -----------------------------
 router.get('/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);
@@ -38,8 +36,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // -----------------------------
-// POST /api/choix
-// → Crée un nouveau choix
+// Créer un nouveau choix
 // -----------------------------
 router.post('/', async (req, res) => {
     const { libelle, id_question } = req.body;
@@ -70,8 +67,7 @@ router.post('/', async (req, res) => {
 });
 
 // -----------------------------
-// PUT /api/choix/:id
-// → Met à jour un choix
+// Mettre à jour un choix
 // -----------------------------
 router.put('/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);
@@ -121,8 +117,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // -----------------------------
-// DELETE /api/choix/:id
-// → Supprime un choix
+// Supprimer un choix
 // -----------------------------
 router.delete('/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);
