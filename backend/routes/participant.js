@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { query } = require('../db'); //db.js
 
+// types de tranche d'âge valides
+const VALID_TRANCHES = ['18-24', '25-34', '35-44', '45-54', '55-64', '+65'];
+
 // -----------------------------
 // LISTER TOUS LES PARTICIPANTS
 // -----------------------------
@@ -36,15 +39,17 @@ router.get('/:id', async (req, res) => {
 // CRÉER UN NOUVEAU PARTICIPANT
 // -----------------------------
 router.post('/', async (req, res) => {
-    const { age, sexe, anciennete, id_categorie } = req.body;
+    const { tranche_age, sexe, anciennete, id_categorie } = req.body;
 
     // Validation basique
     if (!sexe) return res.status(400).json({ error: "Le champ 'sexe' est requis" });
     if (!['H', 'F', 'U'].includes(sexe)) {
         return res.status(400).json({ error: "Le champ 'sexe' doit être 'H', 'F' ou 'U'" });
     }
-    if (age !== undefined && (isNaN(age) || age < 0 || age > 120)) {
-        return res.status(400).json({ error: "L'âge doit être un entier entre 0 et 120" });
+    if (!VALID_TRANCHES.includes(tranche_age)) {
+        return res.status(400).json({ 
+            error: `Le champ 'tranche_age' doit être une tranche valide (${VALID_TRANCHES.join(', ')})`
+        });
     }
     if (anciennete !== undefined && (isNaN(anciennete) || anciennete < 0)) {
         return res.status(400).json({ error: "L'ancienneté doit être un entier positif ou nul" });
@@ -52,10 +57,10 @@ router.post('/', async (req, res) => {
 
     try {
         const result = await query(
-            `INSERT INTO participant (age, sexe, anciennete, date_creation, id_categorie)
+            `INSERT INTO participant (tranche_age, sexe, anciennete, date_creation, id_categorie)
              VALUES ($1, $2, $3, CURRENT_DATE, $4)
-             RETURNING id_participant, age, sexe, anciennete, date_creation, id_categorie`,
-            [age || null, sexe, anciennete || null, id_categorie || null]
+             RETURNING id_participant, tranche_age, sexe, anciennete, date_creation, id_categorie`,
+            [tranche_age, sexe, anciennete || null, id_categorie || null]
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {
@@ -72,7 +77,7 @@ router.put('/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);
     if (Number.isNaN(id)) return res.status(400).json({ error: "ID invalide" });
 
-    const allowed = ['age', 'sexe', 'anciennete', 'id_categorie'];
+    const allowed = ['tranche_age', 'sexe', 'anciennete', 'id_categorie'];
     const updates = [];
     const values = [];
 
@@ -82,8 +87,10 @@ router.put('/:id', async (req, res) => {
             if (key === 'sexe' && !['H', 'F', 'U'].includes(req.body[key])) {
                 return res.status(400).json({ error: "Le champ 'sexe' doit être 'H', 'F' ou 'U'" });
             }
-            if (key === 'age' && (isNaN(req.body[key]) || req.body[key] < 0 || req.body[key] > 120)) {
-                return res.status(400).json({ error: "L'âge doit être entre 0 et 120" });
+            if (key === 'tranche_age' && !VALID_TRANCHES.includes(req.body[key])) {
+                return res.status(400).json({
+                    error: `Le champ 'age' doit être une tranche valide (${VALID_TRANCHES.join(', ')})`
+                });
             }
             if (key === 'anciennete' && (isNaN(req.body[key]) || req.body[key] < 0)) {
                 return res.status(400).json({ error: "L'ancienneté doit être positive" });

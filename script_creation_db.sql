@@ -11,7 +11,9 @@ CREATE TABLE categorie (
 -- TABLE PARTICIPANT
 CREATE TABLE participant (
     id_participant SERIAL PRIMARY KEY,
-    age INT CHECK (age >= 0 AND age <= 120),
+    tranche_age VARCHAR(20) CHECK (
+        tranche_age IN ('18-24', '25-34', '35-44', '45-54', '55-64', '+65')
+    ),
     sexe VARCHAR(10) CHECK (sexe IN ('H', 'F', 'U')),
     anciennete INT CHECK (anciennete IS NULL OR anciennete >= 0),
     date_creation DATE DEFAULT CURRENT_DATE,
