@@ -39,7 +39,7 @@ router.get('/:id', async (req, res) => {
 // CRÉER UN NOUVEAU PARTICIPANT
 // -----------------------------
 router.post('/', async (req, res) => {
-    const { tranche_age, sexe, anciennete, id_categorie } = req.body;
+    const { tranche_age, sexe, anciennete_service, anciennete_fonction, id_categorie } = req.body;
 
     // Validation basique
     if (!sexe) return res.status(400).json({ error: "Le champ 'sexe' est requis" });
@@ -51,16 +51,28 @@ router.post('/', async (req, res) => {
             error: `Le champ 'tranche_age' doit être une tranche valide (${VALID_TRANCHES.join(', ')})`
         });
     }
-    if (anciennete !== undefined && (isNaN(anciennete) || anciennete < 0)) {
-        return res.status(400).json({ error: "L'ancienneté doit être un entier positif ou nul" });
-    }
+    if (anciennete_service !== undefined && (isNaN(anciennete_service) || anciennete_service < 0))
+        return res.status(400).json({ error: "L'ancienneté dans le service doit être un entier positif ou nul" });
+
+    if (anciennete_fonction !== undefined && (isNaN(anciennete_fonction) || anciennete_fonction < 0))
+        return res.status(400).json({ error: "L'ancienneté dans la fonction doit être un entier positif ou nul" });
 
     try {
+        // Vérifie la catégorie pour valider l'anciennete_fonction
+        let categorie = null;
+        if (id_categorie) {
+            const catResult = await query('SELECT categorie FROM categorie WHERE id_categorie = $1', [id_categorie]);
+            categorie = catResult.rows[0]?.categorie;
+            if (anciennete_fonction && categorie !== 'Soignant') {
+                return res.status(400).json({ error: "Le champ 'anciennete_fonction' ne peut être renseigné que pour la catégorie 'Soignant'" });
+            }
+        }
+
         const result = await query(
-            `INSERT INTO participant (tranche_age, sexe, anciennete, date_creation, id_categorie)
-             VALUES ($1, $2, $3, CURRENT_DATE, $4)
-             RETURNING id_participant, tranche_age, sexe, anciennete, date_creation, id_categorie`,
-            [tranche_age, sexe, anciennete || null, id_categorie || null]
+            `INSERT INTO participant (tranche_age, sexe, anciennete_service, anciennete_fonction, date_creation, id_categorie)
+             VALUES ($1, $2, $3, $4, CURRENT_DATE, $5)
+             RETURNING *`,
+            [tranche_age, sexe, anciennete_service || null, anciennete_fonction || null, id_categorie || null]
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {
@@ -77,7 +89,7 @@ router.put('/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);
     if (Number.isNaN(id)) return res.status(400).json({ error: "ID invalide" });
 
-    const allowed = ['tranche_age', 'sexe', 'anciennete', 'id_categorie'];
+    const allowed = ['tranche_age', 'sexe', 'anciennete_service', 'anciennete_fonction', 'id_categorie'];
     const updates = [];
     const values = [];
 
@@ -89,13 +101,13 @@ router.put('/:id', async (req, res) => {
             }
             if (key === 'tranche_age' && !VALID_TRANCHES.includes(req.body[key])) {
                 return res.status(400).json({
-                    error: `Le champ 'age' doit être une tranche valide (${VALID_TRANCHES.join(', ')})`
+                    error: `Le champ 'tranche_age' doit être une tranche valide (${VALID_TRANCHES.join(', ')})`
                 });
             }
-            if (key === 'anciennete' && (isNaN(req.body[key]) || req.body[key] < 0)) {
-                return res.status(400).json({ error: "L'ancienneté doit être positive" });
-            }
-
+            if ((key === 'anciennete_service' || key === 'anciennete_fonction') &&
+                (isNaN(req.body[key]) || req.body[key] < 0))
+                return res.status(400).json({ error: `Le champ '${key}' doit être un entier positif ou nul` });
+            
             updates.push(`${key} = $${values.length + 1}`);
             values.push(req.body[key]);
         }
