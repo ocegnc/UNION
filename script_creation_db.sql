@@ -1,3 +1,11 @@
+DROP TABLE IF EXISTS reponse CASCADE;
+DROP TABLE IF EXISTS choix CASCADE;
+DROP TABLE IF EXISTS question CASCADE;
+DROP TABLE IF EXISTS questionnaire CASCADE;
+DROP TABLE IF EXISTS participant CASCADE;
+DROP TABLE IF EXISTS categorie CASCADE;
+DROP TABLE IF EXISTS administrateur CASCADE;
+
 -- =========================================
 -- SCRIPT SQL CREATION BASE DE DONNEES
 -- =========================================
@@ -10,12 +18,12 @@ CREATE TABLE categorie (
 
 -- TABLE PARTICIPANT
 CREATE TABLE participant (
-    id_participant SERIAL PRIMARY KEY,
+    id_participant VARCHAR(20) PRIMARY KEY,
     tranche_age VARCHAR(20) CHECK (
         tranche_age IN ('18-24', '25-34', '35-44', '45-54', '55-64', '+65')
     ),
     sexe VARCHAR(10) CHECK (sexe IN ('H', 'F', 'U')),
-	anciennete_service INT CHECK (anciennete_service IS NULL OR anciennete_service >= 0),
+    anciennete_service INT CHECK (anciennete_service IS NULL OR anciennete_service >= 0),
     anciennete_fonction INT CHECK (anciennete_fonction IS NULL OR anciennete_fonction >= 0),
     date_creation DATE DEFAULT CURRENT_DATE,
     id_categorie INT REFERENCES categorie(id_categorie) ON DELETE SET NULL
@@ -24,7 +32,7 @@ CREATE TABLE participant (
 -- TABLE QUESTIONNAIRE
 CREATE TABLE questionnaire (
     id_questionnaire SERIAL PRIMARY KEY,
-    id_participant INT REFERENCES participant(id_participant) ON DELETE CASCADE,
+    id_participant VARCHAR(20) REFERENCES participant(id_participant) ON DELETE CASCADE,
     date_remplissage DATE DEFAULT CURRENT_DATE,
     type_questionnaire VARCHAR(50) CHECK (type_questionnaire IN ('Patient', 'Soignant')),
     nb_questions INT CHECK (nb_questions >= 0),
