@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { query } = require('../db'); //db.js
+const { query } = require('../db'); // db.js
 
 // types de tranche d'âge valides
 const VALID_TRANCHES = ['18-24', '25-34', '35-44', '45-54', '55-64', '+65'];
@@ -22,8 +22,8 @@ router.get('/', async (req, res) => {
 // RÉCUPÈRER UN PARTICIPANT PAR ID
 // -----------------------------
 router.get('/:id', async (req, res) => {
-    const id = parseInt(req.params.id, 10);
-    if (Number.isNaN(id)) return res.status(400).json({ error: "ID invalide" });
+    const id = req.params.id;
+    if (!id) return res.status(400).json({ error: "ID invalide" });
 
     try {
         const result = await query('SELECT * FROM participant WHERE id_participant = $1', [id]);
@@ -41,7 +41,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
     const { tranche_age, sexe, anciennete_service, anciennete_fonction, categorie_id } = req.body;
 
-    // Validation basique
+    if (!id_participant) return res.status(400).json({ error: "Le champ 'id_participant' est requis" });
     if (!sexe) return res.status(400).json({ error: "Le champ 'sexe' est requis" });
     if (!['H', 'F', 'U'].includes(sexe)) {
         return res.status(400).json({ error: "Le champ 'sexe' doit être 'H', 'F' ou 'U'" });
@@ -58,7 +58,6 @@ router.post('/', async (req, res) => {
         return res.status(400).json({ error: "L'ancienneté dans la fonction doit être un entier positif ou nul" });
 
     try {
-        // Vérifie la catégorie pour valider l'anciennete_fonction
         let categorie = null;
         if (categorie_id) {
             const catResult = await query('SELECT categorie FROM categorie WHERE categorie_id = $1', [categorie_id]);
@@ -84,13 +83,12 @@ router.post('/', async (req, res) => {
     }
 });
 
-
 // -----------------------------
 // METTRE À JOUR UN PARTICIPANT
 // -----------------------------
 router.put('/:id', async (req, res) => {
-    const id = parseInt(req.params.id, 10);
-    if (Number.isNaN(id)) return res.status(400).json({ error: "ID invalide" });
+    const id = req.params.id;
+    if (!id) return res.status(400).json({ error: "ID invalide" });
 
     const allowed = ['tranche_age', 'sexe', 'anciennete_service', 'anciennete_fonction', 'categorie_id'];
     const updates = [];
@@ -98,7 +96,6 @@ router.put('/:id', async (req, res) => {
 
     allowed.forEach((key) => {
         if (req.body[key] !== undefined) {
-            // Validation spécifique
             if (key === 'sexe' && !['H', 'F', 'U'].includes(req.body[key])) {
                 return res.status(400).json({ error: "Le champ 'sexe' doit être 'H', 'F' ou 'U'" });
             }
@@ -135,8 +132,8 @@ router.put('/:id', async (req, res) => {
 // SUPPRIMER UN PARTICIPANT
 // -----------------------------
 router.delete('/:id', async (req, res) => {
-    const id = parseInt(req.params.id, 10);
-    if (Number.isNaN(id)) return res.status(400).json({ error: "ID invalide" });
+    const id = req.params.id;
+    if (!id) return res.status(400).json({ error: "ID invalide" });
 
     try {
         const result = await query('DELETE FROM participant WHERE id_participant = $1 RETURNING id_participant', [id]);

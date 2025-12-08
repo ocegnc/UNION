@@ -19,7 +19,7 @@ CREATE TABLE participant (
         tranche_age IN ('18-24', '25-34', '35-44', '45-54', '55-64', '+65')
     ),
     sexe VARCHAR(10) CHECK (sexe IN ('H', 'F', 'U')),
-	anciennete_service INT CHECK (anciennete_service IS NULL OR anciennete_service >= 0),
+    anciennete_service INT CHECK (anciennete_service IS NULL OR anciennete_service >= 0),
     anciennete_fonction INT CHECK (anciennete_fonction IS NULL OR anciennete_fonction >= 0),
     date_creation DATE DEFAULT CURRENT_DATE
 );
