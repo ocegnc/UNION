@@ -39,7 +39,7 @@ router.get('/:id', async (req, res) => {
 // CRÉER UN NOUVEAU PARTICIPANT
 // -----------------------------
 router.post('/', async (req, res) => {
-    const { tranche_age, sexe, anciennete_service, anciennete_fonction, id_categorie } = req.body;
+    const { tranche_age, sexe, anciennete_service, anciennete_fonction, categorie_id } = req.body;
 
     // Validation basique
     if (!sexe) return res.status(400).json({ error: "Le champ 'sexe' est requis" });
@@ -60,19 +60,22 @@ router.post('/', async (req, res) => {
     try {
         // Vérifie la catégorie pour valider l'anciennete_fonction
         let categorie = null;
-        if (id_categorie) {
-            const catResult = await query('SELECT categorie FROM categorie WHERE id_categorie = $1', [id_categorie]);
+        if (categorie_id) {
+            const catResult = await query('SELECT categorie FROM categorie WHERE categorie_id = $1', [categorie_id]);
             categorie = catResult.rows[0]?.categorie;
             if (anciennete_fonction && categorie !== 'Soignant') {
                 return res.status(400).json({ error: "Le champ 'anciennete_fonction' ne peut être renseigné que pour la catégorie 'Soignant'" });
             }
+            if (anciennete_service && categorie !== 'Soignant') {
+                return res.status(400).json({ error: "Le champ 'anciennete_service' ne peut être renseigné que pour la catégorie 'Soignant'" });
+            }
         }
 
         const result = await query(
-            `INSERT INTO participant (tranche_age, sexe, anciennete_service, anciennete_fonction, date_creation, id_categorie)
+            `INSERT INTO participant (tranche_age, sexe, anciennete_service, anciennete_fonction, date_creation, categorie_id)
              VALUES ($1, $2, $3, $4, CURRENT_DATE, $5)
              RETURNING *`,
-            [tranche_age, sexe, anciennete_service || null, anciennete_fonction || null, id_categorie || null]
+            [tranche_age, sexe, anciennete_service || null, anciennete_fonction || null, categorie_id || null]
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {
@@ -89,7 +92,7 @@ router.put('/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);
     if (Number.isNaN(id)) return res.status(400).json({ error: "ID invalide" });
 
-    const allowed = ['tranche_age', 'sexe', 'anciennete_service', 'anciennete_fonction', 'id_categorie'];
+    const allowed = ['tranche_age', 'sexe', 'anciennete_service', 'anciennete_fonction', 'categorie_id'];
     const updates = [];
     const values = [];
 

@@ -30,6 +30,11 @@ const questionnairesRoutes = require('./routes/questionnaire');
 const questionsRoutes = require('./routes/question');
 const choixRoutes = require('./routes/choix');
 const reponsesRoutes = require('./routes/reponse');
+const soumissionsRoutes = require('./routes/soumission');
+//question_questionaire
+const QQRoutes = require('./routes/QQ');
+//question_choix
+const QCRoutes = require('./routes/QC');
 //const administrateursRoutes = require('./routes/administrateur');
 
 // Routes
@@ -42,6 +47,9 @@ app.use('/api/questionnaire', questionnairesRoutes);
 app.use('/api/question', questionsRoutes);
 app.use('/api/choix', choixRoutes);
 app.use('/api/reponse', reponsesRoutes);
+app.use('/api/soumission', soumissionsRoutes);
+app.use('/api/QQ', QQRoutes);
+app.use('/api/QC', QCRoutes);
 //app.use('/api/administrateur', administrateursRoutes);
 
 // 404 handler
@@ -65,6 +73,9 @@ app.listen(PORT, () => {
     console.log(`➡️  GET    http://localhost:${PORT}/api/question`);
     console.log(`➡️  GET    http://localhost:${PORT}/api/choix`);
     console.log(`➡️  GET    http://localhost:${PORT}/api/reponse`);
+    console.log(`➡️  GET    http://localhost:${PORT}/api/soumission`);
+    console.log(`➡️  GET    http://localhost:${PORT}/api/QQ`);
+    console.log(`➡️  GET    http://localhost:${PORT}/api/QC`);
 });
 
 // Export app for testing
