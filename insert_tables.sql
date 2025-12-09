@@ -5,8 +5,8 @@ INSERT INTO categorie (categorie) VALUES ('Patient');
 INSERT INTO categorie (categorie) VALUES ('Soignant');
 
 -- Création participant
-INSERT INTO participant (tranche_age, sexe, categorie_id) VALUES ('18-24', 'H', 1);
-INSERT INTO participant (tranche_age, sexe, anciennete_service, anciennete_fonction, categorie_id) VALUES ('18-24', 'H', 3, 2, 2);
+--INSERT INTO participant (tranche_age, sexe, categorie_id) VALUES ('18-24', 'H', 1);
+--INSERT INTO participant (tranche_age, sexe, anciennete_service, anciennete_fonction, categorie_id) VALUES ('18-24', 'H', 3, 2, 2);
 
 -- Valeurs questionnaire
 INSERT INTO questionnaire (titre, categorie_id) VALUES ('Questionnaire patient', 1);
@@ -103,12 +103,12 @@ INSERT INTO choix(libelle) VALUES ('Administrative');
 INSERT INTO choix(libelle) VALUES ('Autres');
 
 --Soumission 
-INSERT INTO soumission(participant_id) VALUES (1);
-INSERT INTO soumission(participant_id) VALUES (2);
+--INSERT INTO soumission(participant_id) VALUES (1);
+--INSERT INTO soumission(participant_id) VALUES (2);
 
 --Réponses à un questionnaire patient
-INSERT INTO reponse(soumission_id, question_id, choix_id) VALUES (1, 8, 20);
-INSERT INTO reponse(soumission_id, question_id, reponse_libre) VALUES (2, 13, 'Femme de ménage');
+--INSERT INTO reponse(soumission_id, question_id, choix_id) VALUES (1, 8, 20);
+--INSERT INTO reponse(soumission_id, question_id, reponse_libre) VALUES (2, 13, 'Femme de ménage');
 
 -- SELECT TABLE
 select * from categorie;
