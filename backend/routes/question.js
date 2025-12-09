@@ -126,6 +126,38 @@ router.put('/:id', async (req, res) => {
     }
 });
 
+// ---------------------------------------------
+// GET /question/:id/choix
+// Retourne les choix possibles pour une question par id_question
+// ---------------------------------------------
+router.get('/:id/choix', async (req, res) => {
+    const questionId = parseInt(req.params.id, 10);
+
+    if (!Number.isInteger(questionId) || questionId <= 0) {
+        return res.status(400).json({ error: "ID question invalide" });
+    }
+
+    try {
+        const choixRes = await query(
+            `SELECT c.id_choix, c.libelle
+             FROM question_choix qc
+             JOIN choix c ON qc.choix_id = c.id_choix
+             WHERE qc.question_id = $1
+             ORDER BY c.id_choix`,
+            [questionId]
+        );
+
+        res.json({
+            id_question: questionId,
+            choix: choixRes.rows
+        });
+
+    } catch (err) {
+        console.error("GET /question/:id/choix error:", err);
+        res.status(500).json({ error: "Erreur serveur lors de la récupération des choix" });
+    }
+});
+
 // -----------------------------
 // Supprimer une question
 // -----------------------------

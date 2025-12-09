@@ -196,6 +196,51 @@ router.get('/:categorie/complet', async (req, res) => {
     }
 });
 
+// ---------------------------------------------
+// Endpoint GET /questionnaire/:categorie/questions
+// Retourne uniquement les questions d'un questionnaire
+// ---------------------------------------------
+router.get('/:categorie/questions', async (req, res) => {
+    const categorie = req.params.categorie.toLowerCase().trim();
+
+    try {
+        // Récupérer l'ID du questionnaire correspondant à la catégorie
+        const qRes = await query(
+            `SELECT q.id_questionnaire
+             FROM questionnaire q
+             JOIN categorie c ON q.categorie_id = c.id_categorie
+             WHERE LOWER(c.categorie) = $1`,
+            [categorie]
+        );
+
+        if (qRes.rows.length === 0) {
+            return res.status(404).json({ error: "Catégorie ou questionnaire introuvable" });
+        }
+
+        const questionnaireId = qRes.rows[0].id_questionnaire;
+
+        // Récupérer les questions
+        const questionsRes = await query(
+            `SELECT q.id_question, q.intitule
+             FROM question_questionnaire qq
+             JOIN question q ON qq.question_id = q.id_question
+             WHERE qq.questionnaire_id = $1
+             ORDER BY q.id_question`,
+            [questionnaireId]
+        );
+
+        res.json({
+            categorie,
+            id_questionnaire: questionnaireId,
+            questions: questionsRes.rows
+        });
+
+    } catch (err) {
+        console.error("GET /questionnaire/:categorie/questions error:", err);
+        res.status(500).json({ error: "Erreur serveur lors de la récupération des questions" });
+    }
+});
+
 // -----------------------------
 // Endpoint GET pour récupérer un questionnaire complet (questions + choix ) par id du questionnaire
 // -----------------------------
