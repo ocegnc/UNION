@@ -7,14 +7,14 @@ select * from question_choix;
 INSERT INTO question_choix (choix_id, question_id)
 SELECT c, q
 FROM generate_series(1, 4) AS c
-CROSS JOIN generate_series(16, 37) AS q
+CROSS JOIN generate_series(9, 30) AS q
 ON CONFLICT DO NOTHING;
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (1, 40),
-	(2, 40),
-	(3, 40),
-	(4, 40);
+    (1, 33),
+	(2, 33),
+	(3, 33),
+	(4, 33);
 
 --CHOIX: Il me plaît beaucoup
 --CHOIX: Il me plaît un peu
@@ -23,16 +23,16 @@ VALUES
 --CHOIX: Il me déplaît beaucoup
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (5, 38),
-	(6, 38),
-	(7, 38),
-	(8, 38),
-	(9, 38);
+    (5, 31),
+	(6, 31),
+	(7, 31),
+	(8, 31),
+	(9, 31);
 --CHOIX: Je ne ressens aucun parfum
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (10, 38),
-	(10, 39);
+    (10, 31),
+	(10, 32);
 --CHOIX: Il est beaucoup trop fort
 --CHOIX: Il est un peu trop fort
 --CHOIX: Il est juste bien en terme d''intensité
@@ -40,11 +40,11 @@ VALUES
 --CHOIX: Il est beaucoup trop faible
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (11, 39),
-	(12, 39),
-	(13, 39),
-	(14, 39),
-	(15, 39);
+    (11, 32),
+	(12, 32),
+	(13, 32),
+	(14, 32),
+	(15, 32);
 	
 --CHOIX: Pas du tout satisfait(e)
 --CHOIX: Peu satisfait(e)
@@ -52,77 +52,77 @@ VALUES
 --CHOIX: Très satisfait(e)
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (16, 41),
-	(17, 41),
-	(18, 41),
-	(19, 41);
+    (16, 34),
+	(17, 34),
+	(18, 34),
+	(19, 34);
 	
 --CHOIX: Oui
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (20, 8),
-	(20, 42),
-	(20, 43);
+    (20, 1),
+	(20, 35),
+	(20, 36);
 --CHOIX: Non
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (21, 8),
-	(21, 42),
-	(21, 43);
+    (21, 1),
+	(21, 35),
+	(21, 36);
 	
 --CHOIX: Perte totale d''odorat
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (22, 9);
+    (22, 2);
 --CHOIX: Perte partielle d''odorat
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (23, 9);
+    (23, 2);
 --CHOIX: Perception déformée d''une odeur
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (24, 9);
+    (24, 2);
 --CHOIX: Présence d''odeurs dantômes
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (25, 9);
+    (25, 2);
 --CHOIX: Moins d''un mois
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (26, 10);
+    (26, 3);
 --CHOIX: Entre 1 et 3 mois
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (27, 10);
+    (27, 3);
 --CHOIX: Plus de 3 mois
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (28, 10);
+    (28, 3);
 --CHOIX: Je suis un(e) ancien(ne) fumeur(se)
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (29, 11);
+    (29, 4);
 --CHOIX: Oui, occasionnellement
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (30, 11);
+    (30, 4);
 --CHOIX: Oui, quotidiennement
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (31, 11);
+    (31, 4);
 --CHOIX: Oui, je vapote
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (32, 11);
+    (32, 4);
 --CHOIX: Médicale ou paramédicale
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (33, 12);
+    (33, 5);
 --CHOIX: Administrative
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (34, 12);
+    (34, 5);
 --CHOIX: Autres
 INSERT INTO question_choix (choix_id, question_id)
 VALUES 
-    (35, 12);
+    (35, 5);
