@@ -13,7 +13,6 @@ import { RouterLink, RouterView } from 'vue-router'
 </template>
 
 <style scoped>
-/* Header minimal en haut */
 header {
   width: 100%;
   padding: 8px 12px;

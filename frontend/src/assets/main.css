@@ -1,19 +1,18 @@
 @import './base.css';
 
 #app {
-  max-width: none;   /* on enlève la limite de 1280px */
-  margin: 0;         /* pas de centrage horizontal */
-  padding: 0;        /* padding géré par main */
-  display: block;    /* pas de grid divisé */
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  display: block;
 }
-
 /* Media query desktop */
 @media (min-width: 1024px) {
   body {
-    display: block;  /* pas de flex centré */
+    display: block;
   }
 
   #app {
-    display: block;  /* plus de grid en 2 colonnes */
+    display: block;
   }
 }

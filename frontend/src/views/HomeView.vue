@@ -85,10 +85,8 @@ const validate = async () => {
   max-width: 400px;   /* taille réduite */
   margin: 40px auto;  /* centré avec un peu de marge haut/bas */
   padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.05);
-  background-color: #61616161;
+  border: 1px solid #000;   /* bordure noire */
+  background-color: white;
 }
 
 label {
