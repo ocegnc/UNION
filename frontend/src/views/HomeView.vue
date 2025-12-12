@@ -23,6 +23,8 @@ const validate = async () => {
   try {
     const res = await getParticipantById(participantId.value);
     participantData = res.data;
+     // 🔥🟦 PRINT DU RESULTAT REÇU
+    console.log("🔥 Participant reçu :", participantData);
     exist = true;
   } catch (e) {
     exist = false;
@@ -39,7 +41,7 @@ const validate = async () => {
       name: "questionnaire",
       query: {
         id: participantId.value,
-        categorie: participantData.id_categorie,
+        categorie: participantData.categorie_id,
         exist: true,
       },
       state: participantData,
