@@ -39,18 +39,20 @@ router.get('/:id', async (req, res) => {
 // CRÉER UN NOUVEAU PARTICIPANT
 // -----------------------------
 router.post('/', async (req, res) => {
-    const { tranche_age, sexe, anciennete_service, anciennete_fonction, categorie_id } = req.body;
+    const { id_participant, tranche_age, sexe, anciennete_service, anciennete_fonction, categorie_id } = req.body;
 
     if (!id_participant) return res.status(400).json({ error: "Le champ 'id_participant' est requis" });
     if (!sexe) return res.status(400).json({ error: "Le champ 'sexe' est requis" });
     if (!['H', 'F', 'U'].includes(sexe)) {
         return res.status(400).json({ error: "Le champ 'sexe' doit être 'H', 'F' ou 'U'" });
     }
+    const VALID_TRANCHES = ['18-24', '25-34', '35-44', '45-54', '55-64', '+65'];
     if (!VALID_TRANCHES.includes(tranche_age)) {
         return res.status(400).json({ 
             error: `Le champ 'tranche_age' doit être une tranche valide (${VALID_TRANCHES.join(', ')})`
         });
     }
+
     if (anciennete_service !== undefined && (isNaN(anciennete_service) || anciennete_service < 0))
         return res.status(400).json({ error: "L'ancienneté dans le service doit être un entier positif ou nul" });
 
@@ -58,23 +60,12 @@ router.post('/', async (req, res) => {
         return res.status(400).json({ error: "L'ancienneté dans la fonction doit être un entier positif ou nul" });
 
     try {
-        let categorie = null;
-        if (categorie_id) {
-            const catResult = await query('SELECT categorie FROM categorie WHERE categorie_id = $1', [categorie_id]);
-            categorie = catResult.rows[0]?.categorie;
-            if (anciennete_fonction && categorie !== 'Soignant') {
-                return res.status(400).json({ error: "Le champ 'anciennete_fonction' ne peut être renseigné que pour la catégorie 'Soignant'" });
-            }
-            if (anciennete_service && categorie !== 'Soignant') {
-                return res.status(400).json({ error: "Le champ 'anciennete_service' ne peut être renseigné que pour la catégorie 'Soignant'" });
-            }
-        }
-
+        // Insertion
         const result = await query(
-            `INSERT INTO participant (tranche_age, sexe, anciennete_service, anciennete_fonction, date_creation, categorie_id)
-             VALUES ($1, $2, $3, $4, CURRENT_DATE, $5)
+            `INSERT INTO participant (id_participant, tranche_age, sexe, anciennete_service, anciennete_fonction, date_creation, categorie_id)
+             VALUES ($1, $2, $3, $4, $5, CURRENT_DATE, $6)
              RETURNING *`,
-            [tranche_age, sexe, anciennete_service || null, anciennete_fonction || null, categorie_id || null]
+            [id_participant, tranche_age, sexe, anciennete_service || null, anciennete_fonction || null, categorie_id]
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {
@@ -82,6 +73,9 @@ router.post('/', async (req, res) => {
         res.status(500).json({ error: "Erreur serveur lors de la création du participant" });
     }
 });
+
+
+
 
 // -----------------------------
 // METTRE À JOUR UN PARTICIPANT

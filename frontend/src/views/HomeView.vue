@@ -1,48 +1,13 @@
-<template>
-  <div class="form-container">
-    <h2>Nouveau questionnaire</h2>
-
-    <label>ID participant :</label>
-    <input v-model="participantId" />
-
-    <label>Catégorie (si nouveau participant) :</label>
-    <select v-model="categorie">
-      <option v-for="cat in categories" :key="cat.id_categorie" :value="cat.id_categorie.toString()">
-        {{ cat.categorie }}
-      </option>
-    </select>
-
-    <button @click="validate">Valider</button>
-
-    <p v-if="error">{{ error }}</p>
-  </div>
-</template>
-
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useParticipant } from "@/services/participantService";
-import { useCategorie } from '@/services/categorieService';
 
-const { getCategories } = useCategorie();
-const categories = ref([]);
 const router = useRouter();
-
-const participantId = ref("");
-const categorie = ref("1");
-const error = ref("");
-
 const { getParticipantById } = useParticipant();
 
-onMounted(async () => {
-  try {
-    const res = await getCategories();
-    categories.value = res.data;
-  } catch (err) {
-    console.error(err);
-    error.value = 'Impossible de charger les catégories';
-  }
-});
+const participantId = ref("");
+const error = ref("");
 
 const validate = async () => {
   error.value = "";
@@ -68,24 +33,49 @@ const validate = async () => {
     }
   }
 
-  router.push({
-    name: "questionnaire",
-    query: {
-      id: participantId.value,
-      categorie: categorie.value,
-      exist,
-    },
-    state: participantData,
-  });
+  if (exist) {
+    // ✔ Participant existe → questionnaire direct
+    router.push({
+      name: "questionnaire",
+      query: {
+        id: participantId.value,
+        categorie: participantData.id_categorie,
+        exist: true,
+      },
+      state: participantData,
+    });
+  } else {
+    // ❌ Participant existe pas → page de création
+    router.push({
+      name: "newpatient",
+      query: {
+        id: participantId.value,
+        exist: false,
+      }
+    });
+  }
 };
 </script>
 
+<template>
+  <div class="form-container">
+    <h2>Nouveau questionnaire</h2>
+
+    <label>ID participant :</label>
+    <input v-model="participantId" />
+
+    <button @click="validate">Valider</button>
+
+    <p v-if="error">{{ error }}</p>
+  </div>
+</template>
+
 <style scoped>
 .form-container {
-  max-width: 400px;   /* taille réduite */
-  margin: 40px auto;  /* centré avec un peu de marge haut/bas */
+  max-width: 400px;
+  margin: 40px auto;
   padding: 20px;
-  border: 1px solid #000;   /* bordure noire */
+  border: 1px solid #000;
   background-color: white;
 }
 
@@ -95,7 +85,7 @@ label {
   font-weight: bold;
 }
 
-input, select {
+input {
   width: 100%;
   padding: 6px;
   margin-top: 4px;
