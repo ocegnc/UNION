@@ -1,5 +1,5 @@
 const express = require('express');
-const { query } = require('../db'); // Connexion centrale
+const { pool, query } = require('../db'); // <- on ajoute pool
 const router = express.Router();
 
 // Helper de validation
@@ -148,14 +148,15 @@ router.put('/:id', async (req, res) => {
 });
 
 // -----------------------------
-// Créer une soumission + réponses d’un coup
+// Créer une soumission + réponses (choix ou libre, même vides)
 // -----------------------------
 router.post('/complete', async (req, res) => {
-    const client = await query.getClient();
+    const client = await pool.connect(); // Utilisation correcte du client
 
     try {
         const { participant_id, questionnaire_id, reponses } = req.body;
 
+        // Vérifications basiques
         if (!participant_id || !questionnaire_id || !Array.isArray(reponses)) {
             return res.status(400).json({
                 error: 'Requête invalide : participant_id, questionnaire_id et reponses[] sont requis'
@@ -164,7 +165,7 @@ router.post('/complete', async (req, res) => {
 
         await client.query('BEGIN');
 
-        // 1. Vérifier que le participant existe
+        // Vérifier que le participant existe
         const checkParticipant = await client.query(
             `SELECT id_participant FROM participant WHERE id_participant = $1`,
             [participant_id]
@@ -174,7 +175,7 @@ router.post('/complete', async (req, res) => {
             return res.status(400).json({ error: 'Participant introuvable' });
         }
 
-        // 2. Vérifier que le questionnaire existe
+        // Vérifier que le questionnaire existe
         const checkQuestionnaire = await client.query(
             `SELECT id_questionnaire FROM questionnaire WHERE id_questionnaire = $1`,
             [questionnaire_id]
@@ -184,7 +185,7 @@ router.post('/complete', async (req, res) => {
             return res.status(400).json({ error: 'Questionnaire introuvable' });
         }
 
-        // 3. Créer la soumission
+        // Créer la soumission
         const soum = await client.query(
             `INSERT INTO soumission (participant_id)
              VALUES ($1)
@@ -194,14 +195,14 @@ router.post('/complete', async (req, res) => {
 
         const idSoumission = soum.rows[0].id_soumission;
 
-        // 4. Vérifier et insérer les réponses
+        // Parcourir les réponses (même vides)
         for (const rep of reponses) {
-            const { question_id, choix_id } = rep;
+            const { question_id, choix_id, reponse_libre } = rep;
 
-            if (!question_id || !choix_id) {
+            if (!question_id) {
                 await client.query('ROLLBACK');
                 return res.status(400).json({
-                    error: 'Chaque réponse doit contenir question_id et choix_id'
+                    error: 'Chaque réponse doit contenir question_id'
                 });
             }
 
@@ -219,25 +220,26 @@ router.post('/complete', async (req, res) => {
                 });
             }
 
-            // Vérifier que le choix est valide pour cette question
-            const checkQC = await client.query(
-                `SELECT 1 FROM question_choix
-                 WHERE question_id = $1 AND choix_id = $2`,
-                [question_id, choix_id]
-            );
-
-            if (checkQC.rows.length === 0) {
-                await client.query('ROLLBACK');
-                return res.status(400).json({
-                    error: `Le choix ${choix_id} n’est pas valide pour la question ${question_id}`
-                });
+            // Si choix_id présent, vérifier que le choix est valide pour la question
+            if (choix_id !== null) {
+                const checkQC = await client.query(
+                    `SELECT 1 FROM question_choix
+                     WHERE question_id = $1 AND choix_id = $2`,
+                    [question_id, choix_id]
+                );
+                if (checkQC.rows.length === 0) {
+                    await client.query('ROLLBACK');
+                    return res.status(400).json({
+                        error: `Le choix ${choix_id} n’est pas valide pour la question ${question_id}`
+                    });
+                }
             }
 
-            // Enregistrer la réponse
+            // Insérer la réponse (même si vide)
             await client.query(
-                `INSERT INTO reponse (soumission_id, question_id, choix_id)
-                 VALUES ($1, $2, $3)`,
-                [idSoumission, question_id, choix_id]
+                `INSERT INTO reponse (soumission_id, question_id, choix_id, reponse_libre)
+                 VALUES ($1, $2, $3, $4)`,
+                [idSoumission, question_id, choix_id || null, reponse_libre || null]
             );
         }
 
@@ -262,10 +264,11 @@ router.post('/complete', async (req, res) => {
     }
 });
 
+
+
 // -------------------------------------------------------------
 // GET /soumission/:id/complet
 // Récupère : soumission + participant + réponses + questions + choix
-// Récap de la soumission complète !
 // -------------------------------------------------------------
 router.get('/:id/complet', async (req, res) => {
     const soumissionId = parseInt(req.params.id, 10);
@@ -274,7 +277,6 @@ router.get('/:id/complet', async (req, res) => {
     }
 
     try {
-        // --- 1) Récupération de la soumission + participant ---
         const soumRes = await query(
             `SELECT s.id_soumission, s.date_remplissage,
                     p.id_participant, p.categorie_id
@@ -297,16 +299,13 @@ router.get('/:id/complet', async (req, res) => {
             }
         };
 
-        // --- 2) Récupération des réponses complètes ---
         const repRes = await query(
             `SELECT 
                 r.id_reponse,
                 r.reponse_libre,
-
                 q.id_question,
                 q.intitule AS question_intitule,
                 q.type_question,
-
                 c.id_choix,
                 c.libelle AS choix_intitule
              FROM reponse r
@@ -331,11 +330,7 @@ router.get('/:id/complet', async (req, res) => {
             } : null
         }));
 
-        // --- 3) Réponse finale ---
-        res.json({
-            soumission,
-            reponses
-        });
+        res.json({ soumission, reponses });
 
     } catch (err) {
         console.error(`GET /soumission/${soumissionId}/complet error :`, err);
