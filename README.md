@@ -31,10 +31,14 @@ L’application développée est une **interface web** permettant :
 L’installation du projet nécessite uniquement les outils suivants :
 
 - **Git** – pour cloner le dépôt GitHub  
-- **Docker Desktop** (ou Docker Engine sur Linux) – pour exécuter les conteneurs  
+- **Docker Desktop** (ou Docker Engine sur Linux) – pour exécuter les conteneurs
+- **PostgreSQL** – pour outils de gestion externe 
 
 🔗 Lien officiel Docker :  
 https://docs.docker.com/get-started/get-docker/
+
+🔗 Lien officiel PostgreSQL :  
+https://www.postgresql.org/download/ 
 
 ⚠️ Assurez-vous que **Docker est bien lancé** avant de continuer.
 
