@@ -27,6 +27,39 @@ const paginatedQuestions = computed(() => {
   return questionnaire.value.questions.slice(start, start + questionsPerPage);
 });
 
+const reponseQ1 = computed(() =>
+  reponses.value.find(r => r.question_id === 1)
+);
+const reponseQ3 = computed(() =>
+  reponses.value.find(r => r.question_id === 5)
+);
+
+const visibleQuestions = computed(() => {
+  return paginatedQuestions.value.filter(q => {
+
+    // Q2 & Q3 visibles uniquement si Q1 = Oui
+    if (q.id_question === 2 || q.id_question === 3) {
+      return Number(reponseQ1.value?.choix_id) === 20;
+    }
+
+    // Q6 visible uniquement si Q3 = "Autres"
+    if (q.id_question === 6) {
+      return Number(reponseQ3.value?.choix_id) === 35;
+    }
+
+    return true;
+  });
+});
+
+const shouldDisplayQuestion = (questionId) => {
+  if (!reponses.value.length) return true;
+
+  if (questionId === 2 || questionId === 3) {
+    return reponseQ1.value?.choix_id === 20;
+  }
+  return true;
+};
+
 const totalPages = computed(() => {
   if (!questionnaire.value) return 0;
   return Math.ceil(questionnaire.value.questions.length / questionsPerPage);
@@ -95,10 +128,33 @@ const submitReponses = async () => {
   const participantId = route.query.id;
   if (!participantId || !questionnaire.value) return;
 
+  const q1 = reponses.value.find(r => r.question_id === 1);
+  const q1IsYes = q1 && q1.choix_id === 20;
+
+  const filteredReponses = reponses.value.filter(r => {
+
+  // Toujours garder Q1
+  if (r.question_id === 1) return true;
+
+  // Q2 & Q3 uniquement si Q1 = Oui
+  if (r.question_id === 2 || r.question_id === 3) {
+    return Number(reponseQ1.value?.choix_id) === 20;
+  }
+
+  // Q6 uniquement si Q3 = "Autres"
+  if (r.question_id === 6) {
+    return Number(reponseQ3.value?.choix_id) === 35
+      && r.reponse_libre.trim() !== "";
+  }
+
+  // Autres questions : garder si réponse donnée
+  return r.choix_id !== null || r.reponse_libre.trim() !== "";
+});
+
   const payload = {
     participant_id: Number(participantId),
     questionnaire_id: questionnaire.value.id_questionnaire,
-    reponses: reponses.value
+    reponses: filteredReponses
   };
 
   console.log("OBJET ENVOYÉ À L'API :", JSON.stringify(payload, null, 2));
@@ -127,7 +183,7 @@ const submitReponses = async () => {
       <div class="questions">
         <div
           class="question-card"
-          v-for="(q, index) in paginatedQuestions"
+          v-for="(q, index) in visibleQuestions"
           :key="q.id_question"
         >
           <h3>{{ (currentPage * questionsPerPage) + index + 1 }}. {{ q.intitule }}</h3>

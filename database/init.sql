@@ -77,7 +77,7 @@ CREATE TABLE question_choix (
 CREATE TABLE soumission (
     id_soumission SERIAL PRIMARY KEY,
     participant_id INT REFERENCES participant(id_participant) ON DELETE CASCADE, -- FK vers PARTICIPANT
-    date_remplissage DATE DEFAULT CURRENT_DATE, -- Date/heure de la soumission
+    date_remplissage TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Date/heure de la soumission
     UNIQUE (participant_id, date_remplissage)
 );
 
@@ -92,7 +92,7 @@ CREATE TABLE reponse (
     reponse_libre VARCHAR(500),
     -- La réponse doit contenir soit un choix (num_choix et intitule), soit une réponse libre
     CONSTRAINT reponse_contenu CHECK (
-        (choix_id IS NOT NULL) OR (reponse_libre IS NOT NULL)
+        choix_id IS NOT NULL OR (reponse_libre IS NOT NULL AND length(trim(reponse_libre)) > 0)
     ),
     -- Un participant ne peut répondre qu'une seule fois à une question spécifique dans le cadre d'une même soumission
     UNIQUE (soumission_id, question_id, choix_id)
