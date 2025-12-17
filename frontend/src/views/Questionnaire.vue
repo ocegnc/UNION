@@ -19,7 +19,7 @@ const questionnaire = ref(null);
    PAGINATION
 ---------------------------- */
 const currentPage = ref(0);
-const questionsPerPage = 5;
+const questionsPerPage = 4;
 
 const paginatedQuestions = computed(() => {
   if (!questionnaire.value) return [];
@@ -186,10 +186,13 @@ const submitReponses = async () => {
           v-for="(q, index) in visibleQuestions"
           :key="q.id_question"
         >
-          <h3>{{ (currentPage * questionsPerPage) + index + 1 }}. {{ q.intitule }}</h3>
+          <h3>
+            {{ (currentPage * questionsPerPage) + index + 1 }}.
+            {{ q.intitule }}
+          </h3>
 
-          <!-- Questions avec choix -->
-          <div v-if="q.choix && q.choix.length > 0">
+          <!-- QUESTIONS AVEC CHOIX -->
+          <div v-if="q.choix && q.choix.length > 0" class="choices-group">
             <div
               v-for="c in q.choix"
               :key="c.id_choix"
@@ -202,11 +205,13 @@ const submitReponses = async () => {
                 v-model="reponses.find(r => r.question_id === q.id_question).choix_id"
                 :value="c.id_choix"
               />
-              <label :for="'c_' + c.id_choix">{{ c.libelle }}</label>
+              <label :for="'c_' + c.id_choix">
+                {{ c.libelle }}
+              </label>
             </div>
           </div>
 
-          <!-- Réponse libre -->
+          <!-- RÉPONSE LIBRE -->
           <div v-else>
             <input
               type="text"
@@ -218,15 +223,23 @@ const submitReponses = async () => {
         </div>
       </div>
 
-      <!-- Pagination -->
+      <!-- PAGINATION -->
       <div class="pagination">
-        <button @click="prevPage" :disabled="currentPage === 0">Précédent</button>
-        <span>Page {{ currentPage + 1 }} / {{ totalPages }}</span>
-        <button @click="nextPage" :disabled="currentPage >= totalPages - 1">Suivant</button>
+        <button @click="prevPage" :disabled="currentPage === 0">
+          Précédent
+        </button>
+        <span>
+          Page {{ currentPage + 1 }} / {{ totalPages }}
+        </span>
+        <button @click="nextPage" :disabled="currentPage >= totalPages - 1">
+          Suivant
+        </button>
       </div>
 
-      <!-- Soumettre toutes les réponses -->
-      <button @click="submitReponses" class="submit-button">Soumettre les réponses</button>
+      <!-- SOUMISSION -->
+      <button @click="submitReponses" class="submit-button">
+        Soumettre les réponses
+      </button>
     </div>
 
     <div v-else>
@@ -239,11 +252,12 @@ const submitReponses = async () => {
   </div>
 </template>
 
+
 <style scoped>
 .container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 20px;
   background-color: white;
   border-radius: 6px;
 }
@@ -255,10 +269,23 @@ const submitReponses = async () => {
   margin-bottom: 10px;
 }
 
+.choices-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
 .choice-item {
   display: flex;
-  align-items: center;
-  margin-top: 6px;
+  align-items: flex-start;
+  gap: 6px;
+  max-width: 45%;
+}
+
+.choice-item label {
+  cursor: pointer;
+  white-space: normal;
+  line-height: 1.4;
 }
 
 .question-card input[type="text"] {
